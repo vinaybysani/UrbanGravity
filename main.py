@@ -6,6 +6,8 @@ CSV/JSON report persistence in outputs/, and rich executive terminal summary ren
 
 import argparse
 import json
+import logging
+from logging.handlers import RotatingFileHandler
 import os
 import sys
 from typing import Dict, List, Any
@@ -215,11 +217,53 @@ def render_terminal_summary(
     print("=" * 78 + "\n")
 
 
+def setup_logging(log_dir: str = "logs") -> logging.Logger:
+    """Configures rotating file logging under log_dir/urbangravity.log at DEBUG level without printing to console."""
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, "urbangravity.log")
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+
+    # Remove any existing console StreamHandlers so logs don't clutter the terminal
+    for h in list(root_logger.handlers):
+        if not isinstance(h, RotatingFileHandler):
+            root_logger.removeHandler(h)
+
+    # Avoid duplicate file handlers
+    if not any(isinstance(h, RotatingFileHandler) for h in root_logger.handlers):
+        handler = RotatingFileHandler(
+            log_file,
+            mode="a",
+            maxBytes=20 * 1024 * 1024,  # 20 MB per file
+            backupCount=10,             # Keep up to 10 historical archives (200+ MB total history)
+            encoding="utf-8"
+        )
+        handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(
+            "%(asctime)s [%(levelname)s] [%(name)s]: %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+
+    # Suppress Python default stderr lastResort fallback
+    logging.lastResort = None
+
+    return logging.getLogger("urbangravity")
+
+
 def main() -> None:
     args = parse_arguments()
+    logger = setup_logging()
+    logger.debug(
+        f"Starting UrbanGravity run: pincode={args.pincode}, area='{args.area}', "
+        f"radius={args.radius}m, mock={args.mock}, refresh={args.refresh}"
+    )
 
     if not args.pincode and not args.area:
         print("Error: You must provide at least a --pincode (e.g. 500034) or an --area (e.g. 'Banjara Hills').", file=sys.stderr)
+        logger.error("Execution aborted: Neither --pincode nor --area provided.")
         sys.exit(1)
 
     api_key = args.api_key or GOOGLE_API_KEY
@@ -232,6 +276,7 @@ def main() -> None:
     # 1. Initialize Collector & Geocode Target
     collector = PlacesCollector(api_key=api_key, use_mock=use_mock)
     lat, lng, resolved_label = collector.geocode_target(pincode=args.pincode, area=args.area)
+    logger.debug(f"Target coordinates resolved: ({lat}, {lng}) -> '{resolved_label}'")
 
     # Infer effective area name if not explicitly provided
     effective_area = args.area
@@ -268,15 +313,28 @@ def main() -> None:
     analysis_results["target"]["resolved_label"] = resolved_label
 
     # 4. Export Artifacts
-    clean_area = (args.area or effective_area or "Area").replace(" ", "_").replace("/", "_")
+    clean_area = (args.area or effective_area or "").replace(" ", "_").replace("/", "_")
     pincode_tag = args.pincode or "Hyderabad"
-    file_prefix = f"{pincode_tag}_{clean_area}"
+    if clean_area and clean_area != pincode_tag and clean_area != "Area":
+        file_prefix = f"{pincode_tag}_{clean_area}"
+    else:
+        file_prefix = pincode_tag
+
+    # Separate live and mock/benchmark artifacts into dedicated subdirectories
+    is_mock = raw_data.get("is_mock", use_mock)
+    mode_subdir = "mock" if is_mock else "live"
+    target_output_dir = os.path.join(args.output_dir, mode_subdir)
 
     file_paths = export_reports(
         analysis_results=analysis_results,
         venues=venues,
-        output_dir=args.output_dir,
+        output_dir=target_output_dir,
         file_prefix=file_prefix
+    )
+    logger.debug(
+        f"Evaluation finished for '{file_prefix}': Tier={analysis_results['classification']['tier']}, "
+        f"AffluenceScore={analysis_results['scores']['affluence_score']:.1f}, "
+        f"Venues={len(venues)}, Reports saved to '{target_output_dir}'"
     )
 
     # 5. Render Terminal Summary

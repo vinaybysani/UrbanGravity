@@ -56,11 +56,12 @@ env*/
 ehthumbs.db
 Thumbs.db
 
-# Output directory artifacts (keep .gitkeep, ignore all generated files)
+# Output directory artifacts (keep base .gitkeep, ignore all generated output subdirs and files)
 outputs/*
 !outputs/.gitkeep
 
 # Logs & Cache
 *.log
+logs/
 data/cache/
 

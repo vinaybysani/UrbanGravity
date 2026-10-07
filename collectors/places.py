@@ -120,15 +120,21 @@ class PlacesCollector:
 
         try:
             data = self._http_get_json(url)
-            if data.get("status") == "OK" and data.get("results"):
+            status = data.get("status")
+            if status == "OK" and data.get("results"):
                 first_res = data["results"][0]
                 lat = first_res["geometry"]["location"]["lat"]
                 lng = first_res["geometry"]["location"]["lng"]
                 fmt_addr = first_res.get("formatted_address", full_address)
+                logger.debug(f"Geocoded '{full_address}' -> ({lat}, {lng}) [{fmt_addr}]")
                 return float(lat), float(lng), fmt_addr
+            else:
+                err_msg = data.get("error_message", "Unknown reason")
+                logger.warning(f"Geocoding API returned non-OK status '{status}' for '{full_address}': {err_msg}")
         except Exception as e:
             logger.warning(f"Geocoding API call failed ({e}). Falling back to Hyderabad Centroid.")
 
+        logger.warning(f"Falling back to Hyderabad Centroid ({HYDERABAD_CENTROID['latitude']}, {HYDERABAD_CENTROID['longitude']}) for '{full_address}'")
         return HYDERABAD_CENTROID["latitude"], HYDERABAD_CENTROID["longitude"], full_address
 
     def query_places_new(
@@ -246,7 +252,7 @@ class PlacesCollector:
             }
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(cache_payload, f, indent=2, ensure_ascii=False)
-            logger.info(f"Cached {len(data.get('venues', []))} venues to {cache_file}")
+            logger.debug(f"Cached {len(data.get('venues', []))} venues to {cache_file}")
         except Exception as e:
             logger.warning(f"Failed to write cache for {pincode}/{area}: {e}")
 

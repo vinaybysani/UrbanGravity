@@ -1,7 +1,7 @@
 # UrbanGravity 🏙️🧲
 
 <p align="center">
-  <img src="assets/urbangravity_logo.png" alt="UrbanGravity Logo" width="380" />
+  <img src="./assets/urbangravity_logo.png" alt="UrbanGravity Logo" width="380" />
 </p>
 
 **UrbanGravity** is a geospatial economic intelligence and real estate analytics platform designed specifically for Indian metropolitan micro-markets, calibrated initially for **Hyderabad, Telangana**.
@@ -122,11 +122,19 @@ python3 main.py --pincode 500034 --area "Banjara Hills" --api-key "AIzaSyYourGoo
 ### 5.3 Cost Protection: Set Quota Limits (Avoid Surprise Charges)
 To prevent unexpected bill shocks from automated loops or testing, set safety caps in [Google Cloud Maps Quotas](https://console.cloud.google.com/google/maps-apis/quotas):
 
-Under **Places API (New)**, edit these two limits:
+#### A. Places API (New)
+Under **Places API (New)**, configure:
 1. **`SearchTextRequest per day`**: Reduce from `75,000` to **`350`** (or `500`).
    - *Rationale*: 1 neighborhood run executes ~32 text searches. 350 allows ~10 full runs/day, capping maximum worst-case daily exposure to ~$7 USD.
 2. **`SearchTextRequest per minute`**: Reduce from `600` to **`60`**.
    - *Rationale*: Instantly throttles runaway CLI loops before they drain credits.
+
+#### B. Geocoding API
+Under **Geocoding API**, configure:
+1. **`v3 requests per day`** & **`v4 GeocodeAddress requests per day`**: Reduce from `Unlimited` to **`50`** (or `100`).
+   - *Rationale*: UrbanGravity executes only 1 geocode request per evaluation. A cap of 50 allows 50 micro-market runs/day while capping daily exposure to ~$0.25 USD.
+2. **`v3 requests per minute`**: Reduce from `3,000` to **`10`** (or `20`).
+   - *Rationale*: Catches and throttles runaway scripts in seconds.
 
 ---
 
@@ -144,7 +152,17 @@ Under **Places API (New)**, edit these two limits:
 | `--custom-proxies` | `str` | `None` | Path to custom scraped JSON or CSV file for real estate rental/cost proxies |
 | `--refresh` / `--no-cache` | `flag` | `False` | Bypass local disk cache and force fresh live queries against Google Places API |
 
-### 6.2 Running Hyderabad Archetype Benchmark Evaluations
+### 6.2 Three Flexible Ways to Target a Locality
+
+You only need to provide **at least one** target identifier (`--pincode` or `--area`):
+
+| Targeting Option | Command Syntax | When to Use |
+| :--- | :--- | :--- |
+| **Option 1: Just PIN Code** *(Recommended)* | `python3 main.py --pincode 500034` | Fastest & most convenient. UrbanGravity automatically resolves coordinates and maps the locality name (e.g. `Banjara Hills`) for report naming. |
+| **Option 2: Just Locality / Area** | `python3 main.py --area "Madhapur"` | When you know the neighborhood name but not the postal code. |
+| **Option 3: Both PIN + Area** | `python3 main.py --pincode 500081 --area "Madhapur"` | For pinpoint centroid precision when a large postal code spans multiple distinct micro-markets. |
+
+### 6.3 Running Hyderabad Archetype Benchmark Evaluations
 
 When no API key is configured or `--mock` is passed, the tool uses an authentic pre-seeded offline dataset of Hyderabad commercial anchors:
 
