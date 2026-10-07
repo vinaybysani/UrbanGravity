@@ -133,19 +133,9 @@ def render_terminal_summary(analysis: Dict[str, Any], file_paths: Dict[str, str]
     reset = "\033[0m"
     bold = "\033[1m"
     cyan = "\033[96m"
-    amber = "\033[38;5;214m"  # Warm amber/gold
-
-    ascii_logo = f"""
-        {cyan}┌─┐{reset}
-     {cyan}┌──┴─┴──┐{reset}         {amber}.   *       +{reset}
-     {cyan}│ █ █ █ │{reset}       {amber}*    .     (🪐){reset}
-   {cyan}┌─┤ █ █ █ ├──┐{reset}        {amber}( ( 🏙️ 🧲 ) ){reset}
-   {cyan}│ │ █ █ █ │█ │{reset}     {amber}.   *       +{reset}
-  {cyan}─┴─┴───────┴──┴─────────────────────────────────────────────────────────────{reset}
-   {bold}U R B A N {amber}G R A V I T Y{reset}  |  {cyan}Real Estate Capital & Demographic Intelligence{reset}
-  {cyan}─────────────────────────────────────────────────────────────────────────────{reset}"""
-
-    print(ascii_logo)
+    print("\n" + "=" * 78)
+    print(f"{bold}{cyan} URBANGRAVITY 🏙️ 🧲 // COMMERCIAL AFFLUENCE & DEMOGRAPHIC INTELLIGENCE{reset}")
+    print("=" * 78)
     print(f" Target Locality    : {bold}{t['area_name']}{reset} (PIN: {t['pincode']})")
     print(f" Resolved Address   : {t['resolved_label']}")
     print(f" Spatial Radius     : {t['radius_meters']}m ({round(t['radius_meters']/1000, 1)} km)")
