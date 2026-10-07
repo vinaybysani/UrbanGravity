@@ -4,8 +4,10 @@ Handles geocoding, Google Places API (New) spatial radius queries, deduplication
 and realistic Hyderabad micro-market benchmark datasets.
 """
 
+import csv
 import json
 import logging
+import os
 import urllib.parse
 from typing import Dict, List, Optional, Tuple, Any
 
@@ -23,6 +25,7 @@ from config import (
     GEOCODING_API_URL,
     PLACES_FIELD_MASK,
     DEFAULT_SEARCH_RADIUS_METERS,
+    CACHE_DIR,
     HYDERABAD_CENTROID,
     CATEGORY_BUCKETS,
     HYDERABAD_PINCODE_BENCHMARKS
@@ -35,11 +38,17 @@ class PlacesCollector:
     """
     Collects commercial venue data from Google Places API (New)
     or generates realistic benchmark data for offline evaluation.
+    Includes automated local disk caching to prevent redundant API calls.
     """
 
-    def __init__(self, api_key: Optional[str] = None, use_mock: bool = False):
+    def __init__(self, api_key: Optional[str] = None, use_mock: bool = False, cache_dir: Optional[str] = None):
         self.api_key = api_key or GOOGLE_API_KEY
         self.use_mock = use_mock or not bool(self.api_key)
+        self.cache_dir = cache_dir or CACHE_DIR
+        try:
+            os.makedirs(self.cache_dir, exist_ok=True)
+        except Exception as e:
+            logger.warning(f"Could not create cache directory {self.cache_dir}: {e}")
 
         if not self.api_key and not use_mock:
             logger.warning("No GOOGLE_API_KEY provided. Defaulting to mock dataset mode.")
@@ -174,23 +183,99 @@ class PlacesCollector:
             logger.error(f"Error querying Places API for '{query}': {e}")
             return []
 
+    def _get_cache_key(self, pincode: Optional[str], area: Optional[str], radius: int) -> str:
+        clean_pin = str(pincode).strip() if pincode else ""
+        clean_area = str(area).strip() if area else ""
+
+        if clean_pin and not clean_area and clean_pin in HYDERABAD_PINCODE_BENCHMARKS:
+            clean_area = HYDERABAD_PINCODE_BENCHMARKS[clean_pin]["area_name"]
+        elif clean_area and not clean_pin:
+            for code, bench in HYDERABAD_PINCODE_BENCHMARKS.items():
+                if clean_area.lower() in bench["area_name"].lower():
+                    clean_pin = code
+                    break
+
+        tag_pin = clean_pin or "HYD"
+        tag_area = clean_area.replace(" ", "_").replace("/", "_") or "Area"
+        return f"{tag_pin}_{tag_area}_{radius}m"
+
+    def _load_from_cache(
+        self,
+        pincode: Optional[str],
+        area: Optional[str],
+        radius: int
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Attempts to load previously collected venues from JSON cache.
+        Returns None if cache is not available.
+        """
+        cache_key = self._get_cache_key(pincode, area, radius)
+        cache_file = os.path.join(self.cache_dir, f"{cache_key}.json")
+
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict) and "venues" in data and "bucket_results" in data:
+                    data["from_cache"] = True
+                    data["cache_source"] = cache_file
+                    return data
+            except Exception as e:
+                logger.warning(f"Error reading cache file {cache_file}: {e}")
+
+        return None
+
+    def _save_to_cache(
+        self,
+        pincode: Optional[str],
+        area: Optional[str],
+        radius: int,
+        data: Dict[str, Any]
+    ) -> None:
+        """Saves collected venue data and bucket results to local JSON cache."""
+        try:
+            cache_key = self._get_cache_key(pincode, area, radius)
+            cache_file = os.path.join(self.cache_dir, f"{cache_key}.json")
+            cache_payload = {
+                "pincode": pincode,
+                "area": area,
+                "radius": radius,
+                "venues": data.get("venues", []),
+                "bucket_results": data.get("bucket_results", {}),
+                "is_mock": data.get("is_mock", False)
+            }
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(cache_payload, f, indent=2, ensure_ascii=False)
+            logger.info(f"Cached {len(data.get('venues', []))} venues to {cache_file}")
+        except Exception as e:
+            logger.warning(f"Failed to write cache for {pincode}/{area}: {e}")
+
     def collect_all_categories(
         self,
         lat: float,
         lng: float,
         radius: int = DEFAULT_SEARCH_RADIUS_METERS,
         pincode: Optional[str] = None,
-        area: Optional[str] = None
+        area: Optional[str] = None,
+        refresh_cache: bool = False
     ) -> Dict[str, Any]:
         """
         Orchestrates queries across all category buckets and deduplicates results.
-        Returns a dict containing:
-          - 'venues': list of deduplicated venues with category assignments
-          - 'bucket_results': mapping of bucket_id -> count & venue names
+        Checks local disk cache first before making live Google Places API requests.
         """
+        # 1. Mock dataset benchmark mode
         if self.use_mock:
             return self._generate_mock_data(lat, lng, pincode, area)
 
+        # 2. Local Disk Cache Check (loads previously collected venues, zero API calls)
+        if not refresh_cache:
+            cached_data = self._load_from_cache(pincode=pincode, area=area, radius=radius)
+            if cached_data:
+                print(f"[CACHE HIT] Loaded {len(cached_data['venues'])} venues from local cache ({cached_data.get('cache_source')}).")
+                print("            Skipped Google Places API calls (Cost: $0.00 / ₹0).")
+                return cached_data
+
+        # 3. Live Google Places API (New) Queries
         unique_venues: Dict[str, Dict[str, Any]] = {}
         bucket_results: Dict[str, Dict[str, Any]] = {}
 
@@ -223,11 +308,17 @@ class PlacesCollector:
                 "venues": [v["name"] for v in bucket_venues[:5]]  # Top 5 sample
             }
 
-        return {
+        result = {
             "venues": list(unique_venues.values()),
             "bucket_results": bucket_results,
-            "is_mock": False
+            "is_mock": False,
+            "from_cache": False
         }
+
+        # 4. Save to local disk cache for future zero-cost executions
+        self._save_to_cache(pincode=pincode, area=area, radius=radius, data=result)
+
+        return result
 
     def _generate_mock_data(
         self,

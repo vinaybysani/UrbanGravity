@@ -43,6 +43,7 @@ PLACES_FIELD_MASK = (
 
 # Spatial Parameters (Hyderabad metro region)
 DEFAULT_SEARCH_RADIUS_METERS = 4000  # 4km default (within 3km - 5km requirement)
+CACHE_DIR = os.getenv("URBANGRAVITY_CACHE_DIR", os.path.join(os.path.dirname(__file__), "data", "cache"))
 HYDERABAD_CENTROID = {
     "latitude": 17.3850,
     "longitude": 78.4867

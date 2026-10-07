@@ -47,6 +47,28 @@ class TestPlacesCollector(unittest.TestCase):
         self.assertGreaterEqual(len(dining_venues), 5)
 
 
+    def test_cache_save_and_load(self):
+        import shutil
+        import tempfile
+        tmp_dir = tempfile.mkdtemp()
+        try:
+            collector = PlacesCollector(use_mock=False, cache_dir=tmp_dir)
+            sample_data = {
+                "venues": [{"id": "v1", "name": "Test Venue", "categories": ["luxury_automotive"]}],
+                "bucket_results": {"luxury_automotive": {"count": 1, "venues": ["Test Venue"]}},
+                "is_mock": False
+            }
+            collector._save_to_cache(pincode="500034", area="Banjara Hills", radius=4000, data=sample_data)
+            
+            cached = collector._load_from_cache(pincode="500034", area="Banjara Hills", radius=4000)
+            self.assertIsNotNone(cached)
+            self.assertEqual(len(cached["venues"]), 1)
+            self.assertEqual(cached["venues"][0]["name"], "Test Venue")
+            self.assertTrue(cached.get("from_cache"))
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
 if __name__ == "__main__":
     unittest.main()
 

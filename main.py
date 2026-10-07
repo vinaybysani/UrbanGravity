@@ -61,6 +61,13 @@ def parse_arguments() -> argparse.Namespace:
         type=str,
         help="Path to custom JSON or CSV file containing real estate rent or cost-for-two data"
     )
+    parser.add_argument(
+        "--refresh",
+        "--no-cache",
+        action="store_true",
+        dest="refresh",
+        help="Bypass local disk cache and force fresh live queries against Google Places API"
+    )
     return parser.parse_args()
 
 
@@ -115,7 +122,12 @@ def export_reports(
     return {"json": json_path, "csv": csv_path}
 
 
-def render_terminal_summary(analysis: Dict[str, Any], file_paths: Dict[str, str], is_mock: bool) -> None:
+def render_terminal_summary(
+    analysis: Dict[str, Any],
+    file_paths: Dict[str, str],
+    is_mock: bool,
+    from_cache: bool = False
+) -> None:
     """Renders a polished, executive terminal dashboard summarizing the evaluation."""
     t = analysis["target"]
     c = analysis["classification"]
@@ -133,13 +145,21 @@ def render_terminal_summary(analysis: Dict[str, Any], file_paths: Dict[str, str]
     reset = "\033[0m"
     bold = "\033[1m"
     cyan = "\033[96m"
+
+    if from_cache:
+        data_source_mode = "[LOCAL DISK CACHE - 0 API Calls / ₹0 Cost]"
+    elif is_mock:
+        data_source_mode = "[OFFLINE MOCK DATASET]"
+    else:
+        data_source_mode = "[LIVE GOOGLE PLACES API (NEW)]"
+
     print("\n" + "=" * 78)
     print(f"{bold}{cyan} URBANGRAVITY 🏙️ 🧲 // COMMERCIAL AFFLUENCE & DEMOGRAPHIC INTELLIGENCE{reset}")
     print("=" * 78)
     print(f" Target Locality    : {bold}{t['area_name']}{reset} (PIN: {t['pincode']})")
     print(f" Resolved Address   : {t['resolved_label']}")
     print(f" Spatial Radius     : {t['radius_meters']}m ({round(t['radius_meters']/1000, 1)} km)")
-    print(f" Data Source Mode   : {'[OFFLINE MOCK DATASET]' if is_mock else '[LIVE GOOGLE PLACES API (NEW)]'}")
+    print(f" Data Source Mode   : {data_source_mode}")
     print("-" * 78)
 
     # Classification Banner
@@ -213,13 +233,22 @@ def main() -> None:
     collector = PlacesCollector(api_key=api_key, use_mock=use_mock)
     lat, lng, resolved_label = collector.geocode_target(pincode=args.pincode, area=args.area)
 
-    # 2. Collect Places
+    # Infer effective area name if not explicitly provided
+    effective_area = args.area
+    if not effective_area:
+        if "(" in resolved_label:
+            effective_area = resolved_label.split("(")[0].strip()
+        else:
+            effective_area = resolved_label.split(",")[0].strip()
+
+    # 2. Collect Places (checks local disk cache first)
     raw_data = collector.collect_all_categories(
         lat=lat,
         lng=lng,
         radius=args.radius,
         pincode=args.pincode,
-        area=args.area
+        area=args.area or effective_area,
+        refresh_cache=args.refresh
     )
     venues = raw_data.get("venues", [])
 
@@ -230,7 +259,7 @@ def main() -> None:
     analysis_results = analyzer.analyze(
         venues=venues,
         pincode=args.pincode,
-        area=args.area,
+        area=args.area or effective_area,
         radius_meters=args.radius
     )
     # Inject spatial coordinates into target info
@@ -239,7 +268,7 @@ def main() -> None:
     analysis_results["target"]["resolved_label"] = resolved_label
 
     # 4. Export Artifacts
-    clean_area = (args.area or "Area").replace(" ", "_").replace("/", "_")
+    clean_area = (args.area or effective_area or "Area").replace(" ", "_").replace("/", "_")
     pincode_tag = args.pincode or "Hyderabad"
     file_prefix = f"{pincode_tag}_{clean_area}"
 
@@ -254,7 +283,8 @@ def main() -> None:
     render_terminal_summary(
         analysis=analysis_results,
         file_paths=file_paths,
-        is_mock=raw_data.get("is_mock", use_mock)
+        is_mock=raw_data.get("is_mock", use_mock),
+        from_cache=raw_data.get("from_cache", False)
     )
 
 

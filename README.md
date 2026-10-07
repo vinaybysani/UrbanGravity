@@ -142,6 +142,7 @@ Under **Places API (New)**, edit these two limits:
 | `--mock` | `flag` | `False` | Run in offline benchmark mode with realistic Hyderabad datasets |
 | `--output-dir` | `str` | `"outputs"` | Directory to store CSV and JSON reports |
 | `--custom-proxies` | `str` | `None` | Path to custom scraped JSON or CSV file for real estate rental/cost proxies |
+| `--refresh` / `--no-cache` | `flag` | `False` | Bypass local disk cache and force fresh live queries against Google Places API |
 
 ### 6.2 Running Hyderabad Archetype Benchmark Evaluations
 

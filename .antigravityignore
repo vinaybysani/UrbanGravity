@@ -17,8 +17,9 @@ __pycache__/
 .git/
 
 # Large Output Artifacts & Runs
-outputs/*.json
-outputs/*.csv
+outputs/*
+!outputs/.gitkeep
+data/cache/
 
 # Heavy Binary Media / Images
 assets/*.png
