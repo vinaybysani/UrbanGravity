@@ -1,0 +1,35 @@
+# Antigravity Context & Indexing Ignore Rules
+# Exclude noisy, generated, virtual environments, and heavy binary assets from agent context
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Git Metadata
+.git/
+
+# Large Output Artifacts & Runs
+outputs/*.json
+outputs/*.csv
+
+# Heavy Binary Media / Images
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
+
+# OS & Editor Artifacts
+.DS_Store
+.idea/
+.vscode/
+
+# Logs & Temporary Files
+*.log
+*.tmp
