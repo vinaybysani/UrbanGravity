@@ -1,0 +1,66 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+venv*/
+.venv/
+.venv*/
+ENV/
+env/
+env*/
+
+# Environment Variables & Secrets (CRITICAL for Google Cloud API keys)
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# IDE / Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Output directory artifacts (keep .gitkeep, ignore generated runs)
+outputs/*.json
+outputs/*.csv
+!outputs/.gitkeep
+
+# Logs
+*.log
+

@@ -1,0 +1,52 @@
+{
+  "500034": {
+    "area_name": "Banjara Hills",
+    "avg_rent_sqft_inr": 85.0,
+    "avg_cost_for_two_inr": 2800.0,
+    "benchmark_tier": "Tier 1",
+    "archetype": "Ultra-Prime Residential & Diplomatic Enclave"
+  },
+  "500033": {
+    "area_name": "Jubilee Hills",
+    "avg_rent_sqft_inr": 95.0,
+    "avg_cost_for_two_inr": 3000.0,
+    "benchmark_tier": "Tier 1",
+    "archetype": "Celebrity & High-Discretionary Lifestyle Hub"
+  },
+  "500081": {
+    "area_name": "Madhapur / Hitec City",
+    "avg_rent_sqft_inr": 62.0,
+    "avg_cost_for_two_inr": 1900.0,
+    "benchmark_tier": "Tier 2",
+    "archetype": "High-Density Technology & Social Microbrewery Hub"
+  },
+  "500032": {
+    "area_name": "Gachibowli",
+    "avg_rent_sqft_inr": 54.0,
+    "avg_cost_for_two_inr": 1650.0,
+    "benchmark_tier": "Tier 2",
+    "archetype": "Corporate Campuses & High-Rise Gated Communities"
+  },
+  "500072": {
+    "area_name": "Kukatpally / KPHB",
+    "avg_rent_sqft_inr": 29.0,
+    "avg_cost_for_two_inr": 650.0,
+    "benchmark_tier": "Tier 3",
+    "archetype": "High-Footfall Middle-Income Residential & Retail Hub"
+  },
+  "500060": {
+    "area_name": "Dilsukhnagar",
+    "avg_rent_sqft_inr": 25.0,
+    "avg_cost_for_two_inr": 500.0,
+    "benchmark_tier": "Tier 3",
+    "archetype": "Traditional South-East Commercial & Educational Hub"
+  },
+  "501401": {
+    "area_name": "Medchal",
+    "avg_rent_sqft_inr": 16.0,
+    "avg_cost_for_two_inr": 350.0,
+    "benchmark_tier": "Tier 4",
+    "archetype": "Periphery Industrial Corridor & Price-Sensitive Growth Zone"
+  }
+}
+
