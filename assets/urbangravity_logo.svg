@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="60%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#030712" />
+    </radialGradient>
+
+    <!-- Tower Gradients -->
+    <linearGradient id="towerGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <linearGradient id="towerGradCenter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818CF8" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+
+    <linearGradient id="towerGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C084FC" />
+      <stop offset="100%" stop-color="#7E22CE" />
+    </linearGradient>
+
+    <!-- Gravity Orbit Ring Gradient -->
+    <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#EF4444" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Canvas Background with rounded squircle -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)" stroke="#312E81" stroke-width="4" />
+
+  <!-- Gravitational Waves / Ripples in Background -->
+  <g opacity="0.25">
+    <circle cx="256" cy="270" r="180" fill="none" stroke="#6366F1" stroke-width="2" stroke-dasharray="6,6" />
+    <circle cx="256" cy="270" r="130" fill="none" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="4,4" />
+    <circle cx="256" cy="270" r="80" fill="none" stroke="#F59E0B" stroke-width="1" />
+  </g>
+
+  <!-- Stars / Spatial Particles -->
+  <g fill="#FFFFFF" opacity="0.6">
+    <circle cx="95" cy="120" r="2.5" />
+    <circle cx="410" cy="110" r="2" />
+    <circle cx="130" cy="380" r="1.5" />
+    <circle cx="420" cy="360" r="2.5" />
+    <circle cx="256" cy="65" r="3" fill="#FDE047" filter="url(#softGlow)" />
+  </g>
+
+  <!-- Back Orbit Segment (Behind Buildings) -->
+  <path d="M 90 320 C 60 250, 150 170, 310 185 C 410 195, 455 240, 440 280"
+        fill="none" stroke="url(#orbitGrad)" stroke-width="6" stroke-linecap="round"
+        opacity="0.45" filter="url(#glow)" />
+
+  <!-- City Skyline / Real Estate Towers -->
+  <!-- Left Building (Modern Residential Tower) -->
+  <rect x="135" y="220" width="65" height="175" rx="8" fill="url(#towerGradLeft)" />
+  <!-- Left Building Windows -->
+  <g fill="#E0F2FE" opacity="0.75">
+    <rect x="147" y="238" width="16" height="12" rx="3" />
+    <rect x="172" y="238" width="16" height="12" rx="3" />
+    <rect x="147" y="260" width="16" height="12" rx="3" />
+    <rect x="172" y="260" width="16" height="12" rx="3" />
+    <rect x="147" y="282" width="16" height="12" rx="3" />
+    <rect x="172" y="282" width="16" height="12" rx="3" />
+    <rect x="147" y="304" width="16" height="12" rx="3" />
+    <rect x="172" y="304" width="16" height="12" rx="3" />
+    <rect x="147" y="326" width="16" height="12" rx="3" />
+    <rect x="172" y="326" width="16" height="12" rx="3" />
+    <rect x="147" y="348" width="16" height="12" rx="3" />
+    <rect x="172" y="348" width="16" height="12" rx="3" />
+  </g>
+
+  <!-- Right Building (Corporate Glass Tower) -->
+  <rect x="310" y="200" width="70" height="195" rx="8" fill="url(#towerGradRight)" />
+  <!-- Right Building Slanted Crown -->
+  <polygon points="310,200 345,165 380,200" fill="#A855F7" />
+  <!-- Right Building Windows -->
+  <g fill="#F3E8FF" opacity="0.75">
+    <rect x="323" y="215" width="18" height="14" rx="3" />
+    <rect x="350" y="215" width="18" height="14" rx="3" />
+    <rect x="323" y="240" width="18" height="14" rx="3" />
+    <rect x="350" y="240" width="18" height="14" rx="3" />
+    <rect x="323" y="265" width="18" height="14" rx="3" />
+    <rect x="350" y="265" width="18" height="14" rx="3" />
+    <rect x="323" y="290" width="18" height="14" rx="3" />
+    <rect x="350" y="290" width="18" height="14" rx="3" />
+    <rect x="323" y="315" width="18" height="14" rx="3" />
+    <rect x="350" y="315" width="18" height="14" rx="3" />
+    <rect x="323" y="340" width="18" height="14" rx="3" />
+    <rect x="350" y="340" width="18" height="14" rx="3" />
+  </g>
+
+  <!-- Center Flagship Skyscraper (The Gravitational Anchor) -->
+  <rect x="210" y="145" width="92" height="250" rx="10" fill="url(#towerGradCenter)" />
+  <!-- Antenna / Spire emitting pulse -->
+  <line x1="256" y1="145" x2="256" y2="95" stroke="#818CF8" stroke-width="4" stroke-linecap="round" />
+  <circle cx="256" cy="90" r="6" fill="#F43F5E" filter="url(#glow)" />
+
+  <!-- Center Windows Grid -->
+  <g fill="#FEF08A" opacity="0.85">
+    <rect x="225" y="165" width="16" height="14" rx="3" />
+    <rect x="248" y="165" width="16" height="14" rx="3" />
+    <rect x="271" y="165" width="16" height="14" rx="3" />
+    
+    <rect x="225" y="190" width="16" height="14" rx="3" />
+    <rect x="248" y="190" width="16" height="14" rx="3" />
+    <rect x="271" y="190" width="16" height="14" rx="3" />
+
+    <rect x="225" y="215" width="16" height="14" rx="3" />
+    <rect x="248" y="215" width="16" height="14" rx="3" />
+    <rect x="271" y="215" width="16" height="14" rx="3" />
+
+    <rect x="225" y="240" width="16" height="14" rx="3" />
+    <rect x="248" y="240" width="16" height="14" rx="3" />
+    <rect x="271" y="240" width="16" height="14" rx="3" />
+
+    <rect x="225" y="265" width="16" height="14" rx="3" />
+    <rect x="248" y="265" width="16" height="14" rx="3" />
+    <rect x="271" y="265" width="16" height="14" rx="3" />
+
+    <rect x="225" y="290" width="16" height="14" rx="3" />
+    <rect x="248" y="290" width="16" height="14" rx="3" />
+    <rect x="271" y="290" width="16" height="14" rx="3" />
+
+    <rect x="225" y="315" width="16" height="14" rx="3" />
+    <rect x="248" y="315" width="16" height="14" rx="3" />
+    <rect x="271" y="315" width="16" height="14" rx="3" />
+
+    <rect x="225" y="340" width="16" height="14" rx="3" />
+    <rect x="248" y="340" width="16" height="14" rx="3" />
+    <rect x="271" y="340" width="16" height="14" rx="3" />
+  </g>
+
+  <!-- Front Dynamic Orbit Ring (Looping IN FRONT of center building) -->
+  <path d="M 440 280 C 420 340, 290 385, 160 365 C 100 355, 75 330, 90 320"
+        fill="none" stroke="url(#orbitGrad)" stroke-width="8" stroke-linecap="round"
+        filter="url(#glow)" />
+  
+  <!-- Gravitational Satellite / Anchor Node (Golden Coin / Node on the ring) -->
+  <circle cx="395" cy="325" r="14" fill="#F59E0B" filter="url(#glow)" />
+  <circle cx="395" cy="325" r="8" fill="#FFFBEB" />
+  <circle cx="140" cy="355" r="9" fill="#06B6D4" filter="url(#softGlow)" />
+
+  <!-- Ground / Base Pedestal -->
+  <rect x="100" y="390" width="312" height="14" rx="7" fill="#1E293B" />
+  <rect x="120" y="402" width="272" height="6" rx="3" fill="#0F172A" />
+
+  <!-- Fun Magnet Symbol Overlay representing Gravitational Pull (🏙️ 🧲) -->
+  <g transform="translate(256, 442)">
+    <!-- Small Brand Wordmark -->
+    <text text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+          font-weight="900" font-size="28" letter-spacing="4" fill="#FFFFFF">
+      URBAN<tspan fill="#F59E0B">GRAVITY</tspan>
+    </text>
+  </g>
+</svg>
