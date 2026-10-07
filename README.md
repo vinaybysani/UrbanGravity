@@ -119,6 +119,15 @@ Pass it directly via the `--api-key` parameter:
 python3 main.py --pincode 500034 --area "Banjara Hills" --api-key "AIzaSyYourGoogleApiKeyHere"
 ```
 
+### 5.3 Cost Protection: Set Quota Limits (Avoid Surprise Charges)
+To prevent unexpected bill shocks from automated loops or testing, set safety caps in [Google Cloud Maps Quotas](https://console.cloud.google.com/google/maps-apis/quotas):
+
+Under **Places API (New)**, edit these two limits:
+1. **`SearchTextRequest per day`**: Reduce from `75,000` to **`350`** (or `500`).
+   - *Rationale*: 1 neighborhood run executes ~32 text searches. 350 allows ~10 full runs/day, capping maximum worst-case daily exposure to ~$7 USD.
+2. **`SearchTextRequest per minute`**: Reduce from `600` to **`60`**.
+   - *Rationale*: Instantly throttles runaway CLI loops before they drain credits.
+
 ---
 
 ## 6. CLI Usage & Examples
