@@ -1,7 +1,7 @@
 # UrbanGravity 🏙️🧲
 
 <p align="center">
-  <img src="assets/urbangravity_banner.svg" alt="UrbanGravity Banner" width="100%" />
+  <img src="assets/urbangravity_logo.png" alt="UrbanGravity Logo" width="380" />
 </p>
 
 **UrbanGravity** is a geospatial economic intelligence and real estate analytics platform designed specifically for Indian metropolitan micro-markets, calibrated initially for **Hyderabad, Telangana**.
